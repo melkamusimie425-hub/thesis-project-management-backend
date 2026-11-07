@@ -1,0 +1,9 @@
+# Track avatar images so they are preserved when copying to another PC
+!.gitkeep
+!.gitignore
+!*/
+!*/*.jpg
+!*/*.jpeg
+!*/*.png
+!*/*.gif
+!*/*.webp

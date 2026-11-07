@@ -1,0 +1,10 @@
+# Track all avatar backup images
+!.gitignore
+!*/
+!*/*.jpg
+!*/*.jpeg
+!*/*.png
+!*/*.gif
+!*/*.webp
+
+**/*.jpg

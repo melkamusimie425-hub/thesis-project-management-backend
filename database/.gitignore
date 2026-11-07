@@ -1,0 +1,8 @@
+*.sqlite*
+
+# But DO track the SQL export and avatar backups
+!otpms_wsu.sql
+!avatars-backup/
+!avatars-backup/**
+
+/otpms_wsu.sql

@@ -1,0 +1,11 @@
+# Track avatar images so they survive PC transfers and Git pushes
+!.gitkeep
+!.gitignore
+!*/
+!*/*.jpg
+!*/*.jpeg
+!*/*.png
+!*/*.gif
+!*/*.webp
+
+**/*.jpg
