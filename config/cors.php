@@ -8,14 +8,19 @@ return [
     // Allowed HTTP methods for the matched paths.
     'allowed_methods' => ['*'],
 
-    // The React SPA runs on Vite's dev server during development.
+    // Allowed origins — local dev + both Vercel URL formats
     'allowed_origins' => [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
         'http://otpms.test',
+        'https://thesis-project-management-frontend-gw8z4uli6-melkia.vercel.app',
+        'https://thesis-project-management-frontend.vercel.app',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        // Allow any Vercel preview deployment URL for this project
+        '#^https://thesis-project-management-frontend.*\.vercel\.app$#',
+    ],
 
     // Headers the browser is allowed to send with the request.
     'allowed_headers' => ['*'],
