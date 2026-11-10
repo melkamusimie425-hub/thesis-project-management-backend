@@ -20,11 +20,11 @@ cmds = ["composer install --no-dev --optimize-autoloader"]
 
 [phases.build]
 cmds = [
-  "php artisan config:cache",
+  "php artisan config:clear",
   "php artisan route:cache",
   "php artisan migrate --force",
   "php artisan db:seed --force"
 ]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan config:clear && php artisan serve --host=0.0.0.0 --port=$PORT"
