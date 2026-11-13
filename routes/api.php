@@ -4,6 +4,7 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\AssessmentCriteriaController;
 use App\Http\Controllers\AssessmentResultController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentReviewController;
@@ -26,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 
 // Avatar images served directly — no auth needed so <img src> works in browser.
-Route::get('/avatar/{user}', [\App\Http\Controllers\AvatarController::class, 'serve']);
+Route::get('/avatar/{user}', [AvatarController::class, 'serve']);
 
 // Public repository: guests may browse published student works (SUC-20).
 Route::get('/documents', [DocumentController::class, 'index']);
@@ -45,8 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'stats']);
 
     // Profile photo -----------------------------------------------------
-    Route::post('/avatar', [\App\Http\Controllers\AvatarController::class, 'upload']);
-    Route::delete('/avatar', [\App\Http\Controllers\AvatarController::class, 'remove']);
+    Route::post('/avatar', [AvatarController::class, 'upload']);
+    Route::delete('/avatar', [AvatarController::class, 'remove']);
 
     // Announcements (all authenticated users can view) -------------------
     Route::get('/notices', [NoticeController::class, 'index']);
@@ -64,8 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{user}/avatar', [UserController::class, 'removeAvatar'])->middleware('role:Administrator');
 
     // Instructor & student lookups (used by assignment forms) -----------
-    Route::get('/instructors', [UserController::class, 'instructors']);
-    Route::get('/students', [UserController::class, 'students']);
+    Route::get('/instructors', [UserController::class, 'instructors'])->middleware('role:UGPC,GPC,SGC,IPC,Administrator,DepartmentHead,Advisor,Examiner');
+    Route::get('/students', [UserController::class, 'students'])->middleware('role:Student,UGPC,GPC,SGC,IPC,Administrator,DepartmentHead,Advisor');
 
     // Academic years (coordinators & admin) ------------------------------
     Route::get('/academic-years', [AcademicYearController::class, 'index']);

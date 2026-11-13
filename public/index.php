@@ -5,6 +5,12 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Enable output buffering to prevent "headers already sent" errors
+// when running via PHP's built-in server (output_buffering = Off in CLI).
+if (! ob_get_level()) {
+    ob_start();
+}
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;

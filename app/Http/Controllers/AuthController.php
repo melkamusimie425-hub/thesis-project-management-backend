@@ -66,21 +66,21 @@ class AuthController extends Controller
     private function userResource(User $user): array
     {
         return [
-            'id'          => $user->id,
-            'first_name'  => $user->first_name,
+            'id' => $user->id,
+            'first_name' => $user->first_name,
             'middle_name' => $user->middle_name,
-            'last_name'   => $user->last_name,
-            'full_name'   => $user->full_name,
-            'email'       => $user->email,
-            'phone'       => $user->phone,
-            'id_number'   => $user->id_number,
-            'gender'      => $user->gender,
-            'program'     => $user->program,
-            'role'        => $user->role,
-            'salutation'  => $user->salutation,
-            'is_active'   => $user->is_active,
-            'initials'    => $user->initials(),
-            'avatar_url'  => $user->avatar_url,
+            'last_name' => $user->last_name,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'id_number' => $user->id_number,
+            'gender' => $user->gender,
+            'program' => $user->program,
+            'role' => $user->role,
+            'salutation' => $user->salutation,
+            'is_active' => $user->is_active,
+            'initials' => $user->initials,
+            'avatar_url' => $user->avatar_url,
         ];
     }
 }

@@ -17,9 +17,9 @@ class UserController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('id_number', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('id_number', 'like', "%{$search}%");
             });
         }
 
@@ -46,28 +46,28 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'first_name'  => ['required', 'string', 'max:80'],
+            'first_name' => ['required', 'string', 'max:80'],
             'middle_name' => ['nullable', 'string', 'max:80'],
-            'last_name'   => ['required', 'string', 'max:80'],
-            'gender'      => ['nullable', Rule::in(['Male', 'Female'])],
-            'id_number'   => ['required', 'string', 'unique:users,id_number'],
-            'email'       => ['required', 'email', 'unique:users,email'],
-            'phone'       => ['nullable', 'string', 'max:30'],
-            'program'     => ['nullable', Rule::in(['Undergraduate', 'Graduate', 'Staff'])],
-            'role'        => ['required', Rule::in([
+            'last_name' => ['required', 'string', 'max:80'],
+            'gender' => ['nullable', Rule::in(['Male', 'Female'])],
+            'id_number' => ['required', 'string', 'unique:users,id_number'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'program' => ['nullable', Rule::in(['Undergraduate', 'Graduate', 'Staff'])],
+            'role' => ['required', Rule::in([
                 'Administrator', 'DepartmentHead', 'UGPC', 'GPC', 'IPC', 'SGC',
                 'Student', 'GradStudent', 'Advisor', 'Examiner', 'Guest',
             ])],
-            'salutation'  => ['nullable', 'string', 'max:30'],
-            'password'    => ['required', 'string', 'min:6', 'confirmed'],
-            'is_active'   => ['boolean'],
+            'salutation' => ['nullable', 'string', 'max:30'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'is_active' => ['boolean'],
         ]);
 
         $user = User::create(Arr::except($data, ['password_confirmation']));
 
         return response()->json([
             'message' => 'User account created successfully.',
-            'user'    => $this->appendExtras($user),
+            'user' => $this->appendExtras($user),
         ], 201);
     }
 
@@ -77,21 +77,21 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'first_name'  => ['sometimes', 'string', 'max:80'],
+            'first_name' => ['sometimes', 'string', 'max:80'],
             'middle_name' => ['sometimes', 'nullable', 'string', 'max:80'],
-            'last_name'   => ['sometimes', 'string', 'max:80'],
-            'gender'      => ['sometimes', 'nullable', Rule::in(['Male', 'Female'])],
-            'id_number'   => ['sometimes', 'string', Rule::unique('users', 'id_number')->ignore($user)],
-            'email'       => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user)],
-            'phone'       => ['sometimes', 'nullable', 'string', 'max:30'],
-            'program'     => ['sometimes', Rule::in(['Undergraduate', 'Graduate', 'Staff'])],
-            'role'        => ['sometimes', Rule::in([
+            'last_name' => ['sometimes', 'string', 'max:80'],
+            'gender' => ['sometimes', 'nullable', Rule::in(['Male', 'Female'])],
+            'id_number' => ['sometimes', 'string', Rule::unique('users', 'id_number')->ignore($user)],
+            'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user)],
+            'phone' => ['sometimes', 'nullable', 'string', 'max:30'],
+            'program' => ['sometimes', Rule::in(['Undergraduate', 'Graduate', 'Staff'])],
+            'role' => ['sometimes', Rule::in([
                 'Administrator', 'DepartmentHead', 'UGPC', 'GPC', 'IPC', 'SGC',
                 'Student', 'GradStudent', 'Advisor', 'Examiner', 'Guest',
             ])],
-            'salutation'  => ['sometimes', 'nullable', 'string', 'max:30'],
-            'password'    => ['sometimes', 'nullable', 'string', 'min:6', 'confirmed'],
-            'is_active'   => ['sometimes', 'boolean'],
+            'salutation' => ['sometimes', 'nullable', 'string', 'max:30'],
+            'password' => ['sometimes', 'nullable', 'string', 'min:6', 'confirmed'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         if (! empty($data['password'])) {
@@ -103,7 +103,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User account updated successfully.',
-            'user'    => $this->appendExtras($user->fresh()),
+            'user' => $this->appendExtras($user->fresh()),
         ]);
     }
 
@@ -118,7 +118,7 @@ class UserController extends Controller
             $json = @json_decode($raw, true);
             if (isset($json['data']) && is_string($json['data'])) {
                 if (preg_match('/^data:image\/(\w+);base64,(.+)$/s', $json['data'], $m)) {
-                    $ext      = strtolower($m[1] === 'jpeg' ? 'jpg' : $m[1]);
+                    $ext = strtolower($m[1] === 'jpeg' ? 'jpg' : $m[1]);
                     $contents = base64_decode($m[2], true);
 
                     if ($contents && strlen($contents) >= 4) {
@@ -132,8 +132,8 @@ class UserController extends Controller
                         $user->update(['avatar_path' => $path]);
 
                         return response()->json([
-                            'message'    => 'Profile photo updated successfully.',
-                            'avatar_url' => url("/api/avatar/{$user->id}") . '?t=' . time(),
+                            'message' => 'Profile photo updated successfully.',
+                            'avatar_url' => url("/api/avatar/{$user->id}").'?t='.time(),
                         ]);
                     }
                 }
@@ -158,9 +158,16 @@ class UserController extends Controller
 
     /**
      * Delete a user account (SUC-19).
+     * An administrator cannot delete their own account.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
+        if ($user->id === $request->user()->id) {
+            return response()->json([
+                'message' => 'You cannot delete your own account.',
+            ], 422);
+        }
+
         // Delete avatar too
         if ($user->avatar_path && Storage::disk('local')->exists($user->avatar_path)) {
             Storage::disk('local')->delete($user->avatar_path);
@@ -176,19 +183,22 @@ class UserController extends Controller
             'instructors' => User::whereIn('role', [
                 'Advisor', 'Examiner', 'UGPC', 'GPC', 'SGC', 'IPC', 'DepartmentHead',
             ])
-            ->where('is_active', true)
-            ->orderBy('last_name')
-            ->get(['id', 'first_name', 'middle_name', 'last_name', 'id_number', 'email', 'role', 'salutation']),
+                ->where('is_active', true)
+                ->orderBy('last_name')
+                ->get(['id', 'first_name', 'middle_name', 'last_name', 'id_number', 'email', 'role', 'salutation']),
         ]);
     }
 
     public function students(Request $request)
     {
         $program = $request->get('program');
-        $query   = User::where('is_active', true)->whereIn('role', ['Student', 'GradStudent']);
+        $query = User::where('is_active', true)->whereIn('role', ['Student', 'GradStudent']);
 
-        if ($program === 'Undergraduate') $query->where('role', 'Student');
-        elseif ($program === 'Graduate')  $query->where('role', 'GradStudent');
+        if ($program === 'Undergraduate') {
+            $query->where('role', 'Student');
+        } elseif ($program === 'Graduate') {
+            $query->where('role', 'GradStudent');
+        }
 
         return response()->json([
             'students' => $query->orderBy('last_name')
@@ -200,15 +210,12 @@ class UserController extends Controller
 
     private function appendExtras(User $user): User
     {
-        // Append computed fields so the frontend receives them
+        // Avatar URL with cache-busting version.
         $user->avatar_url = $user->avatar_path
-            ? url("/api/avatar/{$user->id}") . '?v=' . (substr(md5($user->avatar_path), 0, 8))
+            ? url("/api/avatar/{$user->id}").'?v='.(substr(md5($user->avatar_path), 0, 8))
             : null;
-        $user->full_name  = trim("{$user->first_name} {$user->middle_name} {$user->last_name}");
-        $user->initials   = strtoupper(
-            mb_substr($user->first_name ?? '', 0, 1) .
-            mb_substr($user->last_name  ?? '', 0, 1)
-        );
+
+        // full_name and initials are auto-appended via $appends on the model.
         return $user;
     }
 }

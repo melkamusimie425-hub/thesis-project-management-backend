@@ -20,7 +20,12 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * Accessors appended to JSON serialization.
+     */
+    protected $appends = ['full_name', 'avatar_url', 'initials'];
 
     /**
      * The role hierarchy mapping. Each role may inherit the capabilities of
@@ -48,7 +53,7 @@ class User extends Authenticatable
         return url("/api/avatar/{$this->id}");
     }
 
-    public function initials(): string
+    public function getInitialsAttribute(): string
     {
         $first = mb_substr($this->first_name ?? '', 0, 1);
         $last = mb_substr($this->last_name ?? '', 0, 1);
