@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -97,20 +97,25 @@ return [
             ]) : [],
         ],
 
-        'pgsql' => [
-            'driver' => 'pgsql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
-        ],
+        'pgsql' => (function () {
+            // Render provides DATABASE_URL automatically
+            $url    = env('DATABASE_URL', '');
+            $parsed = $url ? parse_url($url) : [];
+            return [
+                'driver'   => 'pgsql',
+                'url'      => null,
+                'host'     => env('DB_HOST',     $parsed['host']             ?? '127.0.0.1'),
+                'port'     => env('DB_PORT',     $parsed['port']             ?? '5432'),
+                'database' => env('DB_DATABASE', ltrim($parsed['path'] ?? '', '/') ?: 'otpms'),
+                'username' => env('DB_USERNAME', $parsed['user']             ?? 'postgres'),
+                'password' => env('DB_PASSWORD', $parsed['pass']             ?? ''),
+                'charset'  => 'utf8',
+                'prefix'   => '',
+                'prefix_indexes' => true,
+                'search_path'    => 'public',
+                'sslmode'        => env('DB_SSLMODE', 'require'),
+            ];
+        })(),
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
