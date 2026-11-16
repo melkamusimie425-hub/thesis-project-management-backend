@@ -1,19 +1,14 @@
 services:
   - type: web
     name: otpms-backend
-    env: php
+    env: docker
     plan: free
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader --no-scripts
-      mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache
-      chmod -R 777 storage bootstrap/cache
-    startCommand: |
-      php artisan config:clear &&
-      php artisan cache:clear &&
-      php artisan migrate --force &&
-      php artisan db:seed --force &&
-      php artisan serve --host=0.0.0.0 --port=$PORT
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
     envVars:
+      - key: APP_NAME
+        value: "OTPMS - Wolaita Sodo University"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -28,9 +23,22 @@ services:
         value: sync
       - key: FILESYSTEM_DISK
         value: local
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: FRONTEND_URL
+        value: https://thesis-project-management-frontend.vercel.app
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: thesis-project-management-frontend.vercel.app
+      - key: APP_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: otpms-db
+          property: connectionString
 
 databases:
   - name: otpms-db
     plan: free
-    databaseName: otpms
+    region: oregon
+    databaseName: otpms_db
     user: otpms_user
