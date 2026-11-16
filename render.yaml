@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: otpms-backend
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader --no-scripts
+      mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache
+      chmod -R 777 storage bootstrap/cache
+    startCommand: |
+      php artisan config:clear &&
+      php artisan cache:clear &&
+      php artisan migrate --force &&
+      php artisan db:seed --force &&
+      php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+
+databases:
+  - name: otpms-db
+    plan: free
+    databaseName: otpms
+    user: otpms_user

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
+use App\Models\IndustrialProjectGroup;
+use App\Models\Proposal;
 use App\Models\Schedule;
+use App\Models\Thesis;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -36,8 +39,8 @@ class ScheduleController extends Controller
         if ($user->role === 'Examiner' || $user->role === 'Advisor') {
             $query->where(function ($q) use ($user) {
                 $q->where('examiner_one_id', $user->id)
-                  ->orWhere('examiner_two_id', $user->id)
-                  ->orWhere('chair_id', $user->id);
+                    ->orWhere('examiner_two_id', $user->id)
+                    ->orWhere('chair_id', $user->id);
             });
         }
 
@@ -74,6 +77,42 @@ class ScheduleController extends Controller
             return response()->json(['message' => 'No active academic year is set.'], 422);
         }
 
+        // ── Conflict check: same examiner already booked at the same date/time ──
+        $examiners = array_filter([
+            $data['examiner_one_id'],
+            $data['examiner_two_id'],
+            $data['chair_id'] ?? null,
+        ]);
+
+        $conflict = Schedule::where('date', $data['date'])
+            ->where('time', $data['time'])
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($q) use ($examiners) {
+                $q->whereIn('examiner_one_id', $examiners)
+                    ->orWhereIn('examiner_two_id', $examiners)
+                    ->orWhereIn('chair_id', $examiners);
+            })->first();
+
+        if ($conflict) {
+            return response()->json([
+                'message' => 'Scheduling conflict: one or more examiners already have a defense on '
+                    .$data['date'].' at '.$data['time'].'. Please choose a different time.',
+            ], 422);
+        }
+
+        // ── Duplicate: same work already scheduled ──
+        $existing = Schedule::where('work_type', $data['work_type'])
+            ->where('work_id', $data['work_id'])
+            ->where('status', 'scheduled')
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => 'This '.$data['work_type'].' already has an active scheduled defense on '
+                    .$existing->date.' at '.$existing->time.'. Cancel it first.',
+            ], 422);
+        }
+
         $schedule = Schedule::create([
             'work_type' => $data['work_type'],
             'work_id' => $data['work_id'],
@@ -89,7 +128,6 @@ class ScheduleController extends Controller
             'status' => 'scheduled',
         ]);
 
-        // Update the parent work's status.
         $this->markWorkScheduled($data['work_type'], $data['work_id']);
 
         return response()->json([
@@ -126,9 +164,9 @@ class ScheduleController extends Controller
     private function markWorkScheduled(string $workType, int $workId): void
     {
         $model = match ($workType) {
-            'IndustrialProjectGroup' => \App\Models\IndustrialProjectGroup::class,
-            'Proposal' => \App\Models\Proposal::class,
-            'Thesis' => \App\Models\Thesis::class,
+            'IndustrialProjectGroup' => IndustrialProjectGroup::class,
+            'Proposal' => Proposal::class,
+            'Thesis' => Thesis::class,
         };
 
         $model::where('id', $workId)->update(['status' => 'scheduled']);

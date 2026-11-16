@@ -92,8 +92,25 @@ class ProjectTitleController extends Controller
         ]);
     }
 
-    public function destroy(ProjectTitle $title)
+    public function destroy(Request $request, ProjectTitle $title)
     {
+        // Only Administrator can delete approved titles.
+        // IPC/UGPC can delete pending or rejected ones.
+        if ($title->status === 'approved'
+            && $request->user()->role !== 'Administrator') {
+            return response()->json([
+                'message' => 'Only an Administrator can delete an approved title.',
+            ], 403);
+        }
+
+        // If deleting an approved title, reset the group status too.
+        if ($title->status === 'approved') {
+            $title->group()->update([
+                'approved_title' => null,
+                'status' => 'title_submitted',
+            ]);
+        }
+
         $title->delete();
 
         return response()->json(['message' => 'Title removed.']);
